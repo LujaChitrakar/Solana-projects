@@ -11,16 +11,23 @@ const votingAddress = new PublicKey(
 );
 
 describe("Voting", () => {
-  it("Initialize Poll", async () => {
-    const context = await startAnchor(
+  let context;
+  let provider;
+  let votingProgram: anchor.Program<Voting>;
+
+  beforeAll(async () => {
+    context = await startAnchor(
       "",
       [{ name: "voting", programId: votingAddress }],
       []
     );
-    const provider = new BankrunProvider(context);
 
-    const votingProgram = new Program<Voting>(IDL, provider);
+    provider = new BankrunProvider(context);
 
+    votingProgram = new Program<Voting>(IDL, provider);
+  });
+
+  it("Initialize Poll", async () => {
     await votingProgram.methods
       .initializePoll(
         new anchor.BN(1),
@@ -36,9 +43,47 @@ describe("Voting", () => {
     );
 
     const poll = await votingProgram.account.poll.fetch(pollAddress);
-
     console.log(poll);
+
+    expect(poll.pollId.toNumber()).toEqual(1);
+    expect(poll.description).toEqual(
+      "What is your favorite type of peanut butter?"
+    );
+    expect(poll.pollStart.toNumber()).toEqual(0);
+    expect(poll.pollEnd.toNumber()).toEqual(1843746801);
+    expect(poll.candidateAmount.toNumber()).toEqual(0);
   });
+
+  it("Initialize Candidate", async () => {
+    await votingProgram.methods
+      .initializeCandidate("Smooth", new anchor.BN(1))
+      .rpc();
+    await votingProgram.methods
+      .initializeCandidate("Crunchy", new anchor.BN(1))
+      .rpc();
+
+    const [crunchyAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Crunchy")],
+      votingAddress
+    );
+    const [smoothAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Smooth")],
+      votingAddress
+    );
+
+    const crunchyCandidate = await votingProgram.account.candidate.fetch(
+      crunchyAddress
+    );
+    const smoothCandidate = await votingProgram.account.candidate.fetch(
+      smoothAddress
+    );
+
+    expect(crunchyCandidate.candidateVotes.toNumber()).toEqual(0);
+    expect(smoothCandidate.candidateVotes.toNumber()).toEqual(0);
+    console.log(crunchyCandidate, smoothCandidate);
+  });
+
+  it("Vote", async () => {});
 });
 
 // anchor test --skip-local-validator --skip-deploy
