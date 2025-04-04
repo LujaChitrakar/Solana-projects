@@ -83,7 +83,18 @@ describe("Voting", () => {
     console.log(crunchyCandidate, smoothCandidate);
   });
 
-  it("Vote", async () => {});
+  it("Vote", async () => {
+    await votingProgram.methods.vote("Smooth", new anchor.BN(1)).rpc();
+
+    const [smoothAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Smooth")],
+      votingAddress
+    );
+    const smoothCandidate = await votingProgram.account.candidate.fetch(
+      smoothAddress
+    );
+    expect(smoothCandidate.candidateVotes.toNumber()).toEqual(1);
+  });
 });
 
 // anchor test --skip-local-validator --skip-deploy
