@@ -142,8 +142,4 @@ pub struct Candidate{
     candidate_votes:u64
 }
 
-#[account]
-#[derive(InitSpace)]
-pub struct Vote{
 
-}
