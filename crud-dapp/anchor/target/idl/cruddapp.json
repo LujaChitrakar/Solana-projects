@@ -1,5 +1,5 @@
 {
-  "address": "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF",
+  "address": "FQbq9Lvg86BuKAdkvx6HeN87DWhHijdBDaisd1YAhfi9",
   "metadata": {
     "name": "cruddapp",
     "version": "0.1.0",
@@ -8,56 +8,88 @@
   },
   "instructions": [
     {
-      "name": "close",
-      "discriminator": [98, 165, 201, 177, 108, 65, 206, 96],
+      "name": "create_journal_entry",
+      "discriminator": [
+        48,
+        65,
+        201,
+        186,
+        25,
+        41,
+        127,
+        0
+      ],
       "accounts": [
         {
-          "name": "payer",
+          "name": "owner",
           "writable": true,
           "signer": true
         },
         {
-          "name": "cruddapp",
-          "writable": true
+          "name": "journal_entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "title"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
-    },
-    {
-      "name": "decrement",
-      "discriminator": [106, 227, 168, 59, 248, 27, 150, 101],
-      "accounts": [
+      "args": [
         {
-          "name": "cruddapp",
-          "writable": true
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "message",
+          "type": "string"
         }
-      ],
-      "args": []
+      ]
     },
     {
-      "name": "increment",
-      "discriminator": [11, 18, 104, 9, 104, 174, 59, 33],
-      "accounts": [
-        {
-          "name": "cruddapp",
-          "writable": true
-        }
+      "name": "delete_entry",
+      "discriminator": [
+        227,
+        198,
+        83,
+        191,
+        70,
+        23,
+        194,
+        58
       ],
-      "args": []
-    },
-    {
-      "name": "initialize",
-      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
       "accounts": [
         {
-          "name": "payer",
+          "name": "owner",
           "writable": true,
           "signer": true
         },
         {
-          "name": "cruddapp",
+          "name": "journal_entry",
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "title"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
         },
         {
           "name": "system_program",
@@ -67,37 +99,91 @@
       "args": []
     },
     {
-      "name": "set",
-      "discriminator": [198, 51, 53, 241, 116, 29, 126, 194],
+      "name": "update_entry",
+      "discriminator": [
+        70,
+        47,
+        181,
+        2,
+        1,
+        40,
+        2,
+        92
+      ],
       "accounts": [
         {
-          "name": "cruddapp",
-          "writable": true
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "journal_entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "title"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "value",
-          "type": "u8"
+          "name": "_title",
+          "type": "string"
+        },
+        {
+          "name": "message",
+          "type": "string"
         }
       ]
     }
   ],
   "accounts": [
     {
-      "name": "Cruddapp",
-      "discriminator": [255, 176, 4, 245, 188, 253, 124, 25]
+      "name": "JournalEntryState",
+      "discriminator": [
+        113,
+        86,
+        110,
+        124,
+        140,
+        14,
+        58,
+        66
+      ]
     }
   ],
   "types": [
     {
-      "name": "Cruddapp",
+      "name": "JournalEntryState",
+      "docs": [
+        "STATES"
+      ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "count",
-            "type": "u8"
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "message",
+            "type": "string"
           }
         ]
       }
