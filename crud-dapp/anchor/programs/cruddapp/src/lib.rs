@@ -96,4 +96,4 @@ pub struct JournalEntryState{
   pub title:String,
   #[max_len(1000)]
   pub message:String
-}
+} 
