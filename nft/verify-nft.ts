@@ -1,7 +1,9 @@
 import {
   createNft,
   fetchDigitalAsset,
+  findMetadataPda,
   mplTokenMetadata,
+  verifyCollectionV1,
 } from "@metaplex-foundation/mpl-token-metadata";
 import {
   airdropIfRequired,
@@ -14,6 +16,7 @@ import {
   generateSigner,
   keypairIdentity,
   percentAmount,
+  publicKey,
 } from "@metaplex-foundation/umi";
 
 const connection = new Connection(clusterApiUrl("devnet"));
@@ -27,7 +30,7 @@ await airdropIfRequired(
   0.5 * LAMPORTS_PER_SOL
 );
 
-console.log("Loaded user", user.publicKey);
+console.log("Loaded user", user.publicKey.toBase58());
 
 const umi = createUmi(connection.rpcEndpoint);
 umi.use(mplTokenMetadata());
@@ -37,26 +40,24 @@ umi.use(keypairIdentity(umiUser));
 
 console.log("UMI instance for user");
 
-const collectionMint = generateSigner(umi);
-const transaction = await createNft(umi, {
-  mint: collectionMint,
-  name: "My collections",
-  symbol: "MC",
-  uri: "https://raw.githubusercontent.com/LujaChitrakar/Solana-projects/refs/heads/main/new-token/metadata.json?token=GHSAT0AAAAAAC3UNGRCHMUDEVEJU4YZRST6Z7UXU3Q",
-  sellerFeeBasisPoints: percentAmount(0),
-  isCollection: true,
+const collectionAddress = publicKey(
+  "cVhFEQxmQqPFenPHW3JbKohyR3i9kZRBzPbBj8Aic2y"
+);
+const nftAddress = publicKey("GwifRKjk4zhHVmie2EjzJCwHHrfajW24vm96uFNwXA2L");
+console.log(`Creating NFT... `);
+
+const transaction = await verifyCollectionV1(umi, {
+  metadata: findMetadataPda(umi, { mint: nftAddress }),
+  collectionMint: collectionAddress,
+  authority: umi.identity,
 });
+
 await transaction.sendAndConfirm(umi);
 
-const createdCollectionNft = await fetchDigitalAsset(
-  umi,
-  collectionMint.publicKey
-);
-
 console.log(
-  `Created collection . Address is ${getExplorerLink(
+  `NFT verified. Address is ${nftAddress},see explorer at ${getExplorerLink(
     "address",
-    createdCollectionNft.publicKey,
+    nftAddress,
     "devnet"
   )}`
 );

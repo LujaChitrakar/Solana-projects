@@ -14,6 +14,7 @@ import {
   generateSigner,
   keypairIdentity,
   percentAmount,
+  publicKey,
 } from "@metaplex-foundation/umi";
 
 const connection = new Connection(clusterApiUrl("devnet"));
@@ -27,7 +28,7 @@ await airdropIfRequired(
   0.5 * LAMPORTS_PER_SOL
 );
 
-console.log("Loaded user", user.publicKey);
+console.log("Loaded user", user.publicKey.toBase58());
 
 const umi = createUmi(connection.rpcEndpoint);
 umi.use(mplTokenMetadata());
@@ -37,26 +38,31 @@ umi.use(keypairIdentity(umiUser));
 
 console.log("UMI instance for user");
 
-const collectionMint = generateSigner(umi);
+const collectionAddress = publicKey(
+  "cVhFEQxmQqPFenPHW3JbKohyR3i9kZRBzPbBj8Aic2y"
+);
+console.log(`Creating NFT... `);
+
+const mint = generateSigner(umi);
+
 const transaction = await createNft(umi, {
-  mint: collectionMint,
-  name: "My collections",
-  symbol: "MC",
+  mint,
+  name: "My NFT",
   uri: "https://raw.githubusercontent.com/LujaChitrakar/Solana-projects/refs/heads/main/new-token/metadata.json?token=GHSAT0AAAAAAC3UNGRCHMUDEVEJU4YZRST6Z7UXU3Q",
   sellerFeeBasisPoints: percentAmount(0),
-  isCollection: true,
+  collection: {
+    key: collectionAddress,
+    verified: false,
+  },
 });
+
 await transaction.sendAndConfirm(umi);
 
-const createdCollectionNft = await fetchDigitalAsset(
-  umi,
-  collectionMint.publicKey
-);
-
+const createdNft = await fetchDigitalAsset(umi, mint.publicKey);
 console.log(
-  `Created collection . Address is ${getExplorerLink(
+  `NFT created. Address is ${getExplorerLink(
     "address",
-    createdCollectionNft.publicKey,
+    createdNft.mint.publicKey,
     "devnet"
   )}`
 );
