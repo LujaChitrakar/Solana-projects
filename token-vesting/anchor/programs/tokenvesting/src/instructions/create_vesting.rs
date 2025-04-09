@@ -50,6 +50,7 @@ pub struct VestingAccount {
 }
 
 /*-- For Employee --*/
+
 #[derive(Accounts)]
 pub struct CreateEmployeeAccount<'info> {
     #[account(mut)]
