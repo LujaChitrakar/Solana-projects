@@ -14,6 +14,94 @@ export type Tokenvesting = {
   },
   "instructions": [
     {
+      "name": "createEmployeeAccount",
+      "discriminator": [
+        94,
+        118,
+        255,
+        19,
+        171,
+        159,
+        58,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "vestingAccount"
+          ]
+        },
+        {
+          "name": "vestingAccount"
+        },
+        {
+          "name": "employeeAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  109,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  101,
+                  95,
+                  118,
+                  101,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "beneficiary"
+              },
+              {
+                "kind": "account",
+                "path": "vestingAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "beneficiary"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "startTime",
+          "type": "i64"
+        },
+        {
+          "name": "endTime",
+          "type": "i64"
+        },
+        {
+          "name": "cliffTime",
+          "type": "i64"
+        },
+        {
+          "name": "totalAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "createVestingAccount",
       "discriminator": [
         129,
@@ -98,6 +186,19 @@ export type Tokenvesting = {
   ],
   "accounts": [
     {
+      "name": "employeeAccount",
+      "discriminator": [
+        65,
+        245,
+        87,
+        188,
+        58,
+        86,
+        209,
+        151
+      ]
+    },
+    {
       "name": "vestingAccount",
       "discriminator": [
         102,
@@ -112,6 +213,46 @@ export type Tokenvesting = {
     }
   ],
   "types": [
+    {
+      "name": "employeeAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "beneficiary",
+            "type": "pubkey"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "cliffTime",
+            "type": "i64"
+          },
+          {
+            "name": "vestingAccount",
+            "type": "pubkey"
+          },
+          {
+            "name": "totalAmount",
+            "type": "u64"
+          },
+          {
+            "name": "totalWithdraw",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "vestingAccount",
       "type": {
