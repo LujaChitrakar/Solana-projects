@@ -1,13 +1,23 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { BanksClient, ProgramTestContext, startAnchor } from "solana-bankrun";
+import {
+  BanksClient,
+  Clock,
+  ProgramTestContext,
+  startAnchor,
+} from "solana-bankrun";
 import IDL from "../target/idl/tokenvesting.json";
 import { SYSTEM_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/native/system";
 import { BankrunProvider } from "anchor-bankrun";
 import { Tokenvesting } from "../target/types/tokenvesting";
-import { Program } from "@coral-xyz/anchor";
-import { createMint } from "@solana/spl-token";
+import { Program, BN } from "@coral-xyz/anchor";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { createMint, mintTo } from "spl-token-bankrun";
+import { resolve } from "path";
 
 describe("Vesting Smart contract Test", () => {
   const companyName = "company name";
@@ -51,7 +61,6 @@ describe("Vesting Smart contract Test", () => {
 
     employer = provider.wallet.payer;
 
-    //@ts-expect-error - Type error in spl-token-bankrun dependency
     mint = await createMint(banksClient, employer, employer.publicKey, null, 2);
 
     beneficiary_provider = new BankrunProvider(context);
@@ -81,4 +90,86 @@ describe("Vesting Smart contract Test", () => {
       program.programId
     );
   });
+
+  /**-- Writing Tests */
+
+  it("Should create a vesting account", async () => {
+    const tx = await program.methods
+      .createVestingAccount(companyName)
+      .accounts({
+        signer: employer.publicKey,
+        mint,
+        token_program: TOKEN_PROGRAM_ID,
+      })
+      .rpc({ commitment: "confirmed" });
+
+    const vestingAccountData = await program.account.vestingAccount.fetch(
+      tokenVestingAccountKey,
+      "confirmed"
+    );
+
+    console.log("Vesting account data: ", vestingAccountData, null, 2);
+    console.log("Create vesting account", tx);
+  });
+
+  it("Should fund the treasury token account ", async () => {
+    const amount = 10_000 * 10 ** 9;
+    const mintTx = await mintTo(
+      banksClient,
+      employer,
+      mint,
+      treasuryTokenAccountKey,
+      employer,
+      amount
+    );
+    console.log("Mint Treasury Token Account", mintTx);
+  });
+
+  it("should create an employee vesting account", async () => {
+    const mintDecimals = 2;
+
+    // ENSURE this calculation results in a non-zero value
+    const totalAmountBaseUnits = new BN(10_000 * 10 ** mintDecimals); // Example: 1,000,000
+    console.log(
+      `Calculated totalAmountBaseUnits to be passed: ${totalAmountBaseUnits.toString()}`
+    ); // Add log
+
+    const tx = await program.methods
+      .createEmployeeAccount(new BN(0), new BN(100), new BN(100), new BN(0))
+      .accounts({
+        beneficiary: beneficiary.publicKey,
+        vestingAccount: tokenVestingAccountKey,
+      })
+      .rpc({ commitment: "confirmed", skipPreflight: true });
+
+    console.log("Employee vesting account created:", tx);
+    console.log("Employee Account:", employeeAccountKey.toBase58());
+  });
+
+  // it("should claim tokens", async () => {
+  //   const currentClock = await banksClient.getClock();
+
+  //   console.log("Clock before setting:", currentClock.unixTimestamp.toString());
+  //   const targetTimestamp = 101n;
+  //   context.setClock(
+  //     new Clock(
+  //       currentClock.slot,
+  //       currentClock.epochStartTimestamp,
+  //       currentClock.epoch,
+  //       currentClock.leaderScheduleEpoch,
+  //       targetTimestamp
+  //     )
+  //   );
+
+  //   console.log("Employee account", employeeAccountKey.toBase58());
+
+  //   const tx3 = await program2.methods
+  //     .claimTokens(companyName)
+  //     .accounts({
+  //       tokenProgram: TOKEN_PROGRAM_ID,
+  //     })
+  //     .rpc({ commitment: "confirmed" });
+
+  //   console.log("Claim Tokens transaction signature", tx3);
+  // });
 });

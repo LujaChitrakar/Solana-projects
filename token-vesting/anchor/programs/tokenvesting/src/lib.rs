@@ -3,7 +3,7 @@ pub mod instructions;
 
 use anchor_lang::prelude::*;
 use instructions::create_vesting::*;
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+declare_id!("7aMD5drZpzaD3Yp4R499DSMu2BHyK4gJRzpXtzbmByZT");
 
 #[program]
 pub mod tokenvesting {
@@ -36,7 +36,7 @@ pub mod tokenvesting {
         total_amount: u64,
     ) -> Result<()> {
         *ctx.accounts.employee_account = EmployeeAccount {
-            beneficiary: ctx.accounts.owner.key(),
+            beneficiary: ctx.accounts.beneficiary.key(),
             start_time: start_time,
             end_time: end_time,
             cliff_time: cliff_time,
