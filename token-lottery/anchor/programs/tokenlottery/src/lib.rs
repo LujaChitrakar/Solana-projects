@@ -128,7 +128,11 @@ pub mod tokenlottery {
             },
             &signer_seeds,
         ))?;
-        
+
+        Ok(())
+    }
+
+    pub fn buy_ticket(ctx:Context<BuyTicket>)->Result<()>{
         Ok(())
     }
 }

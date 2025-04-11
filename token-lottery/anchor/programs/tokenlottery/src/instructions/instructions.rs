@@ -23,21 +23,6 @@ pub struct InitializeConfig<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[account]
-#[derive(InitSpace)]
-pub struct TokenLottery {
-    pub winner: u64,
-    pub winner_chosen: bool,
-    pub start_time: u64,
-    pub end_time: u64,
-    pub lottery_pot_amount: u64,
-    pub total_tickets: u64,
-    pub ticket_price: u64,
-    pub authority: Pubkey,
-    pub randomness_account: Pubkey,
-    pub bump: u8,
-}
-
 /*----------- INITIALIZE LOTTERY -----------*/
 
 #[derive(Accounts)]
@@ -96,3 +81,31 @@ pub struct InitializeLottery<'info> {
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
 }
+
+#[derive(Accounts)]
+pub struct BuyTicket<'info>{
+    #[account(mut)]
+    pub payer:Signer<'info>,
+
+    #[account(
+        init,
+    )]
+
+    pub system_program:Program<'info,System>
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct TokenLottery {
+    pub winner: u64,
+    pub winner_chosen: bool,
+    pub start_time: u64,
+    pub end_time: u64,
+    pub lottery_pot_amount: u64,
+    pub total_tickets: u64,
+    pub ticket_price: u64,
+    pub authority: Pubkey,
+    pub randomness_account: Pubkey,
+    pub bump: u8,
+}
+
