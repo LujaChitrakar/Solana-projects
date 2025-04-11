@@ -178,6 +178,10 @@ export type Tokenlottery = {
           }
         },
         {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
           "name": "tokenMetadataProgram",
           "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
         },
@@ -323,6 +327,23 @@ export type Tokenlottery = {
           }
         ]
       }
+    }
+  ],
+  "constants": [
+    {
+      "name": "name",
+      "type": "string",
+      "value": "\"Token lottery Ticket #\""
+    },
+    {
+      "name": "symbol",
+      "type": "string",
+      "value": "\"TLT\""
+    },
+    {
+      "name": "uri",
+      "type": "string",
+      "value": "\"https://media.istockphoto.com/id/1500283713/vector/cinema-ticket-on-white-background-movie-ticket-on-white-background.jpg?s=2048x2048&w=is&k=20&c=FVKTESRh2yCgIhKNOX1p3WliXW6jf9iGcErciapIIJw=\""
     }
   ]
 };

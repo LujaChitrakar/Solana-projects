@@ -90,6 +90,7 @@ pub struct InitializeLottery<'info> {
         seeds::program=token_metadata_program.key())]
     pub master_edition: UncheckedAccount<'info>,
 
+    pub rent: Sysvar<'info, Rent>,
     pub token_metadata_program: Program<'info, Metadata>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
