@@ -38,7 +38,7 @@ pub struct TokenLottery {
     pub bump: u8,
 }
 
-/*----------- INITIALIZE CONFIG -----------*/
+/*----------- INITIALIZE LOTTERY -----------*/
 
 #[derive(Accounts)]
 pub struct InitializeLottery<'info> {
